@@ -1,42 +1,44 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Login</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}"> <!-- Estilo opcional -->
-</head>
-<body>
-    <h1>Teste: Cpf- 12345678 / Senha- senha1</h1>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='login.css') }}"
+    />
+  </head>
+  <body>
     <div class="container">
-        <h2>Login de Funcionário</h2>
-        <form action="{{ url_for('login_post') }}" method="POST">
-            <label for="cpf_cnpj">CPF ou CNPJ:</label>
-            <input type="text" id="cpf_cnpj" name="cpf_cnpj" required>
+      <h2>Login de Funcionário</h2>
+      <form action="{{ url_for('login_post') }}" method="POST">
+        <label for="cpf_cnpj">CPF ou CNPJ:</label>
+        <input type="text" id="cpf_cnpj" name="cpf_cnpj" required />
 
-            <label for="senha">Senha:</label>
-            <input type="password" id="senha" name="senha" required>
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" name="senha" required />
 
-            <button type="submit">Login</button>
-        </form>
+        <button type="submit">Login</button>
+      </form>
 
-        <h2>Cadastrar Funcionário</h2>
-        <form action="{{ url_for('cadastrar_funcionario') }}" method="POST">
-            <label for="nome">Nome:</label>
-            <input type="text" id="nome" name="nome" required>
+      <h2>Cadastrar Funcionário</h2>
+      <form action="{{ url_for('cadastrar_funcionario') }}" method="POST">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" name="nome" required />
 
-            <label for="cpf_cnpj">CPF ou CNPJ:</label>
-            <input type="text" id="cpf_cnpj" name="cpf_cnpj" required>
+        <label for="cpf_cnpj">CPF ou CNPJ:</label>
+        <input type="text" id="cpf_cnpj" name="cpf_cnpj" required />
 
-            <label for="senha">Senha:</label>
-            <input type="password" id="senha" name="senha" required>
+        <label for="senha">Senha:</label>
+        <input type="password" id="senha" name="senha" required />
 
-            <button type="submit">Cadastrar</button>
-        </form>
+        <button type="submit">Cadastrar</button>
+      </form>
 
-        <div id="message"></div>
+      <div id="message"></div>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script> <!-- Script opcional -->
-</body>
+    <script src="{{ url_for('static', filename='login.js') }}"></script>
+  </body>
 </html>
