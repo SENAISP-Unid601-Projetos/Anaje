@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Pousadas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+   
+    <a href="/index" class="return-menu-button">Menu Principal</a>
+
+    <header>
+        <h1>Gerenciamento de Pousadas</h1>
+        <div id="resultado" class="result-box"></div>
+    </header>
+
+    <main class="container">
+       
+        <section class="form-section">
+            <h2>Cadastrar Pousada</h2>
+            <input type="text" id="id_pousada" placeholder="ID da Pousada">
+            <input type="text" id="nome_pousada" placeholder="Nome da Pousada">
+            <input type="text" id="valor_pousada" placeholder="Valor da Pousada">
+            <button onclick="cadastrarPousada()">Cadastrar Pousada</button>
+        </section>
+        
+        
+        <section class="list-section">
+            <h2>Pousadas Cadastradas</h2>
+            <input type="text" id="pesquisa_pousada" placeholder="Buscar por ID da pousada">
+            <button id="botaoProcurarPousada" onclick="procurarPousada()">Procurar Pousada</button>
+            <button id="botaoExcluirPousada" onclick="excluirPousada()">Excluir Pousada</button>
+            <button id="botaoListarPousadas" onclick="listarPousadas()">Exibir Todas as Pousadas</button>
+            <ul id="lista_pousadas"></ul>
+        </section>
+        
+       
+        <div id="form_editar_pousada" class="hidden">
+            <h3>Editar Pousada</h3>
+            <input type="text" id="editar_id_pousada" readonly>
+            <input type="text" id="editar_nome_pousada" placeholder="Nome da Pousada">
+            <input type="text" id="editar_valor_pousada" placeholder="Valor da Pousada">
+            <button onclick="salvarEdicaoPousada()">Salvar Alterações</button>
+        </div>
+
+        
+        <section id="reservas_pousada" class="hidden">
+            <h2>Reservas da Pousada</h2>
+            <ul id="lista_reservas_pousada"></ul>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+listarPousadas();
+});
+
+function cadastrarPousada() {
+    const idPousada = document.getElementById('id_pousada').value;
+    const nome = document.getElementById('nome_pousada').value;
+    const valor = document.getElementById('valor_pousada').value;
+
+    fetch('/cadastrar_pousada', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id_pousada: idPousada, nome: nome, valor: valor })
+    })
+    .then(response => response.json())
+    .then(result => {
+        alert(result.message);
+        listarPousadas();
+        limparCamposCadastro();
+    })
+    .catch(error => {
+        alert('Erro ao cadastrar pousada: ' + error.message);
+    });
+}
+
+function listarPousadas() {
+    fetch('/listar_pousadas')
+        .then(response => response.json())
+        .then(pousadas => {
+            const lista = document.getElementById('lista_pousadas');
+            lista.innerHTML = '';
+            lista.style.display = 'block';
+            pousadas.forEach(pousada => {
+                const item = document.createElement('li');
+                item.innerHTML = `ID: ${pousada.id}, Nome: ${pousada.nome}, Valor: ${pousada.valor}`;
+                item.id = `pousada-${pousada.id}`;
+                if (pousada.reservas && pousada.reservas.length > 0) {
+                    const reservasList = document.createElement('ul');
+                    pousada.reservas.forEach(reserva => {
+                        const reservaItem = document.createElement('li');
+                        reservaItem.textContent = `Check-in: ${reserva.dia_checkin}, Check-out: ${reserva.dia_checkout}`;
+                        reservasList.appendChild(reservaItem);
+                    });
+                    item.appendChild(reservasList);
+                }
+                lista.appendChild(item);
+            });
+        });
+}
+
+function procurarPousada() {
+    const idPousada = document.getElementById('pesquisa_pousada').value;
+    fetch('/listar_pousadas')
+        .then(response => response.json())
+        .then(pousadas => {
+            const lista = document.getElementById('lista_pousadas');
+            lista.innerHTML = '';
+            lista.style.display = 'block';
+            pousadas.forEach(pousada => {
+                if (pousada.id == idPousada) {
+                    const item = document.createElement('li');
+                    item.innerHTML = `ID: ${pousada.id}, Nome: ${pousada.nome}, Valor: ${pousada.valor}`;
+                    item.id = `pousada-${pousada.id}`;
+                    if (pousada.reservas && pousada.reservas.length > 0) {
+                        const reservasList = document.createElement('ul');
+                        pousada.reservas.forEach(reserva => {
+                            const reservaItem = document.createElement('li');
+                            reservaItem.textContent = `Check-in: ${reserva.dia_checkin}, Check-out: ${reserva.dia_checkout}`;
+                            reservasList.appendChild(reservaItem);
+                        });
+                        item.appendChild(reservasList);
+                    }
+                    lista.appendChild(item);
+                }
+            });
+            limparCampoPesquisa();
+        });
+}
+
+function excluirPousada() {
+    const idPousada = document.getElementById('pesquisa_pousada').value;
+    fetch('/remover_pousada', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id_pousada: idPousada })
+    })
+    .then(response => response.json())
+    .then(result => {
+        alert(result.message);
+        const item = document.getElementById(`pousada-${idPousada}`);
+        if (item) {
+            item.remove();
+        }
+    })
+    .catch(error => {
+        alert('Erro ao excluir pousada: ' + error.message);
+    });
+}
+
+function editarPousada(id) {
+    fetch(`/listar_reservas_pousada?pousada_id=${id}`)
+        .then(response => response.json())
+        .then(reservas => {
+            document.getElementById('editar_id_pousada').value = id;
+            document.getElementById('form_editar_pousada').classList.remove('hidden');
+
+            const lista = document.getElementById('lista_reservas_pousada');
+            lista.innerHTML = '';
+            reservas.forEach(reserva => {
+                const item = document.createElement('li');
+                item.textContent = `Check-in: ${reserva.dia_checkin}, Check-out: ${reserva.dia_checkout}`;
+                lista.appendChild(item);
+            });
+            document.getElementById('reservas_pousada').classList.remove('hidden');
+        });
+}
+
+function salvarEdicaoPousada() {
+    const idPousada = document.getElementById('editar_id_pousada').value;
+    const nome = document.getElementById('editar_nome_pousada').value;
+    const valor = document.getElementById('editar_valor_pousada').value;
+
+    fetch('/editar_pousada', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id_pousada: idPousada, nome: nome, valor: valor })
+    })
+    .then(response => response.json())
+    .then(result => {
+        alert(result.message);
+        listarPousadas();
+    })
+    .catch(error => {
+        console.error('Erro ao editar pousada:', error);
+        alert('Erro ao editar pousada: ' + error.message);
+    });
+}
+
+function limparCamposCadastro() {
+    document.getElementById('id_pousada').value = '';
+    document.getElementById('nome_pousada').value = '';
+    document.getElementById('valor_pousada').value = '';
+}
+</script>
+</html>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Principal - Gerenciamento de Pousadas e Clientes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header>
+        <h1>Menu Principal</h1>
+        <p>Bem-vindo ao sistema de gerenciamento. Escolha uma das opções abaixo:</p>
+        <!-- Botão de Deslogar -->
+        <button onclick="confirmLogout()" class="logout-button">Deslogar</button>
+    </header>
+
+    <main class="menu-container">
+        <!-- Botão para Gerenciar Clientes -->
+        <section class="menu-option">
+            <h2>Gerenciar Clientes</h2>
+            <p>Para gerenciar o cadastro, listagem e edição de clientes, clique no botão abaixo.</p>
+            <a href="/clientes" class="menu-button">Ir para Clientes</a>
+        </section>
+
+        <!-- Botão para Gerenciar Pousadas -->
+        <section class="menu-option">
+            <h2>Gerenciar Pousadas</h2>
+            <p>Para gerenciar o cadastro, listagem e edição de pousadas, clique no botão abaixo.</p>
+            <a href="/pousadas" class="menu-button">Ir para Pousadas</a>
+        </section>
+
+        <!-- Botão para Reservas -->
+        <section class="menu-option">
+            <h2>Reservas</h2>
+            <p>Para gerenciar as reservas, clique no botão abaixo.</p>
+            <a href="/reservas" class="menu-button">Ir para Reservas</a>
+        </section>
+
+    <script>
+        function confirmLogout() {
+            if (confirm("Você realmente deseja sair?")) {
+                window.location.href = "/logout";
+            }
+        }
+    </script>
+
+    <button id="chatbotButton">Chat</button>
+
+    <div id="chatbotWindow" style="display: none; position: fixed; bottom: 100px; right: 20px;">
+        <div id="chatbotHeader">Chatbot</div>
+        <div id="chatbotContent">
+            <div class="message bot-message">Olá! Como posso ajudar você hoje?</div>
+        </div>
+        <div id="chatbotInputContainer">
+            <input type="text" id="chatbotInput" placeholder="Digite sua mensagem...">
+            <button id="sendButton">Enviar</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-pOa0tNBRFnuCxOxdFYbYJ2KwSgDkWbg4NTqxrmdESBCjvXG6R/QpuYo/Dsw0r50V" crossorigin="anonymous"></script>
+</body>
+</html>

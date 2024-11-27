@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Clientes</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <!-- Botão de Retornar ao Menu -->
+    <a href="/index" class="return-menu-button">Menu Principal</a>
+
+    <header>
+        <h1>Gerenciamento de Clientes</h1>
+        <!-- Div para mostrar mensagens de resultado -->
+        <div id="resultado" class="result-box"></div>
+    </header>
+
+    <main class="container">
+        <!-- Seção para cadastrar clientes -->
+        <section class="form-section">
+            <h2>Cadastrar Cliente</h2>
+            <input type="text" id="nome_cliente" placeholder="Nome do Cliente">
+            <input type="text" id="cpf_cnpj" placeholder="CPF ou CNPJ">
+            <input type="text" id="telefone" placeholder="Telefone">
+            <input type="email" id="email" placeholder="E-mail">
+            <button onclick="cadastrarCliente()">Cadastrar Cliente</button>
+        </section>
+
+        <!-- Seção para listar e gerenciar clientes -->
+        <section class="list-section">
+            <h2>Clientes Cadastrados</h2>
+            <button id="botaoListarClientes" onclick="listarClientes()">Listar Todos os Clientes</button>
+            <ul id="lista_clientes" style="display: none;"></ul>
+        </section>
+
+        <!-- Formulário para edição de cliente -->
+        <div id="form_editar_cliente" class="hidden">
+            <h3>Editar Cliente</h3>
+            <input type="text" id="editar_nome_cliente" placeholder="Nome do Cliente">
+            <input type="text" id="editar_cpf_cnpj_cliente" readonly> <!-- CPF/CNPJ não é editável -->
+            <input type="text" id="editar_telefone_cliente" placeholder="Telefone">
+            <input type="email" id="editar_email_cliente" placeholder="E-mail">
+            <button onclick="salvarEdicaoCliente()">Salvar Alterações</button>
+        </div>
+    </main>
+
+    <!-- Scripts para funcionalidades de cliente -->
+    <script src="static/js/cliente.js"></script>
+</body>
+</html>

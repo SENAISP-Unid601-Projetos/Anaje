@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gerenciamento de Reservas</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    
+    <a href="/index" class="return-menu-button">Menu Principal</a>
+
+    <header>
+        <h1>Gerenciamento de Reservas</h1>
+        <div id="resultado" class="result-box"></div>
+    </header>
+
+    <main class="container">
+        
+        <section class="form-section">
+            <h2>Faça uma Reserva</h2>
+            <form id="reservaForm" onsubmit="incluirReserva(event)">
+                <label for="nomeCompleto">Nome Completo</label>
+                <input type="text" id="nomeCompleto" name="nomeCompleto" required>
+                
+                <label for="cpf">CPF</label>
+                <input type="text" id="cpf" name="cpf" required>
+                
+                <label for="pousadaId">Pousada ID</label>
+                <input type="text" id="pousadaId" name="pousadaId" onchange="buscarPousada()" required>
+                
+                <label for="nomePousada">Nome da Pousada</label>
+                <input type="text" id="nomePousada" name="nomePousada" readonly>
+                
+                <label for="valorDiaria">Valor da Diária</label>
+                <input type="text" id="valorDiaria" name="valorDiaria" readonly required>
+                
+                <label for="quantidade">Número de Pessoas</label>
+                <input type="number" id="quantidade" name="quantidade" required>
+                
+                <label for="diaCheckin">Data de Check-in</label>
+                <input type="date" id="diaCheckin" name="diaCheckin" onchange="calcularValor()" required>
+                
+                <label for="diaCheckout">Data de Check-out</label>
+                <input type="date" id="diaCheckout" name="diaCheckout" onchange="calcularValor()" required>
+                
+                <label for="valor">Preço Total</label>
+                <input type="text" id="valor" name="valor" readonly>
+                
+                <label for="metodoPagamento">Método de Pagamento</label>
+                <input type="text" id="metodoPagamento" name="metodoPagamento" required>
+                
+                <button type="submit">Incluir</button>
+            </form>
+        </section>
+
+        
+        <section class="list-section">
+            <h2>Reservas Feitas</h2>
+            
+           
+            <div class="search-section">
+                <input type="text" id="pesquisa_reserva" placeholder="Digite o ID da Pousada para pesquisa">
+                <button onclick="procurarReserva()">Pesquisar Reserva</button>
+                <button onclick="listarReservas()">Listar Reservas</button>
+                <button onclick="excluirReserva()">Excluir Reserva</button>
+            </div>
+            
+            <ul id="lista_reservas"></ul>
+        </section>
+
+        
+        <section class="form-section hidden" id="form_editar_reserva">
+            <h2>Editar Reserva</h2>
+            <form id="editarReservaForm" onsubmit="salvarEdicaoReserva(event)">
+                <label for="editar_nomeCompleto">Nome Completo</label>
+                <input type="text" id="editar_nomeCompleto" name="nomeCompleto" required>
+
+                <label for="editar_cpf">CPF</label>
+                <input type="text" id="editar_cpf" name="cpf" required>
+
+                <label for="editar_pousadaId">Pousada ID</label>
+                <input type="text" id="editar_pousadaId" name="pousadaId" readonly>
+
+                <label for="editar_nomePousada">Nome da Pousada</label>
+                <input type="text" id="editar_nomePousada" name="nomePousada" readonly>
+
+                <label for="editar_valorDiaria">Valor da Diária</label>
+                <input type="text" id="editar_valorDiaria" name="valorDiaria" readonly required>
+
+                <label for="editar_quantidade">Número de Pessoas</label>
+                <input type="number" id="editar_quantidade" name="quantidade" required>
+
+                <label for="editar_diaCheckin">Data de Check-in</label>
+                <input type="date" id="editar_diaCheckin" name="diaCheckin" required>
+
+                <label for="editar_diaCheckout">Data de Check-out</label>
+                <input type="date" id="editar_diaCheckout" name="diaCheckout" required>
+
+                <label for="editar_valor">Preço Total</label>
+                <input type="text" id="editar_valor" name="valor" readonly>
+
+                <label for="editar_metodoPagamento">Método de Pagamento</label>
+                <input type="text" id="editar_metodoPagamento" name="metodoPagamento" required>
+
+                <button type="submit">Salvar Modificação</button>
+            </form>
+        </section>
+    </main>
+
+</body>
+</html>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    listarReservas();
+});
+
+function buscarPousada() {
+    const pousadaId = document.getElementById('pousadaId').value;
+
+    fetch(`/buscar_pousada_preco?pousada_id=${pousadaId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na resposta da rede');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('nomePousada').value = data.nome;
+                document.getElementById('valorDiaria').value = data.valor;
+                calcularValor(); 
+            } else {
+                alert(data.message); 
+                document.getElementById('nomePousada').value = '';
+                document.getElementById('valorDiaria').value = '';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar pousada:', error);
+            alert('Erro ao buscar pousada: ' + error.message);
+            document.getElementById('nomePousada').value = '';
+            document.getElementById('valorDiaria').value = '';
+        });
+}
+
+function calcularValor() {
+    const diaCheckin = new Date(document.getElementById('diaCheckin').value);
+    const diaCheckout = new Date(document.getElementById('diaCheckout').value);
+    const valorDiaria = parseFloat(document.getElementById('valorDiaria').value);
+
+    if (diaCheckin && diaCheckout && !isNaN(valorDiaria)) {
+        const quantidadeDias = Math.ceil((diaCheckout - diaCheckin) / (1000 * 60 * 60 * 24));
+
+        if (quantidadeDias > 0) {
+            const valorTotal = quantidadeDias * valorDiaria;
+            document.getElementById('valor').value = valorTotal.toFixed(2);
+        } else {
+            document.getElementById('valor').value = "0.00";
+        }
+    }
+}
+
+function calcularValorEdicao() {
+    const diaCheckin = new Date(document.getElementById('editar_diaCheckin').value);
+    const diaCheckout = new Date(document.getElementById('editar_diaCheckout').value);
+    const valorDiaria = parseFloat(document.getElementById('editar_valorDiaria').value);
+
+    if (diaCheckin && diaCheckout && !isNaN(valorDiaria)) {
+        const quantidadeDias = Math.ceil((diaCheckout - diaCheckin) / (1000 * 60 * 60 * 24));
+
+        if (quantidadeDias > 0) {
+            const valorTotal = quantidadeDias * valorDiaria;
+            document.getElementById('editar_valor').value = valorTotal.toFixed(2);
+        } else {
+            document.getElementById('editar_valor').value = "0.00";
+        }
+    }
+}
+
+function incluirReserva(event) {
+    event.preventDefault();
+    const form = document.getElementById('reservaForm');
+
+    const data = {
+        nomeCompleto: form.nomeCompleto.value,
+        cpf: form.cpf.value,
+        pousadaId: form.pousadaId.value,
+        diaCheckin: form.diaCheckin.value,
+        diaCheckout: form.diaCheckout.value,
+        quantidade: form.quantidade.value,
+        valor: form.valor.value,
+        metodoPagamento: form.metodoPagamento.value
+    };
+
+    fetch('/reservar_pousada', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw err; });
+        }
+        return response.json();
+    })
+    .then(result => {
+        if (result.success) {
+            alert(result.message);
+            form.reset();
+            listarReservas();
+        } else {
+            alert(result.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao incluir reserva:', error);
+        alert('Erro ao incluir reserva: ' + error.message);
+    });
+}
+
+function listarReservas() {
+    fetch('/listar_reservas')
+        .then(response => response.json())
+        .then(reservas => {
+            const lista = document.getElementById('lista_reservas');
+            lista.innerHTML = '';
+            reservas.forEach(reserva => {
+                const item = document.createElement('li');
+                item.innerHTML = `
+                    Pousada: ${reserva.pousadaId}, Cliente: ${reserva.nomeCompleto}, Check-in: ${reserva.diaCheckin}, Check-out: ${reserva.diaCheckout}
+                    <button onclick="mostrarFormEdicao('${reserva.cpf}', '${reserva.pousadaId}', '${reserva.nomeCompleto}', '${reserva.diaCheckin}', '${reserva.diaCheckout}', ${reserva.quantidade}, ${reserva.valor}, '${reserva.metodoPagamento}')">Editar</button>
+                `;
+                lista.appendChild(item);
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao listar reservas:', error);
+            alert('Erro ao listar reservas: ' + error.message);
+        });
+}
+
+function procurarReserva() {
+    const pousadaId = document.getElementById('pesquisa_reserva').value;
+    fetch('/listar_reservas')
+        .then(response => response.json())
+        .then(reservas => {
+            const lista = document.getElementById('lista_reservas');
+            lista.innerHTML = '';
+            reservas.forEach(reserva => {
+                if (reserva.pousadaId == pousadaId) {
+                    const item = document.createElement('li');
+                    item.innerHTML = `Pousada: ${reserva.pousadaId}, Cliente: ${reserva.nomeCompleto}, Check-in: ${reserva.diaCheckin}, Check-out: ${reserva.diaCheckout}`;
+                    lista.appendChild(item);
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao procurar reserva:', error);
+            alert('Erro ao procurar reserva: ' + error.message);
+        });
+}
+
+function excluirReserva() {
+    const pousadaId = document.getElementById('pesquisa_reserva').value;
+    fetch('/remover_reserva', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ pousada_id: pousadaId })
+    })
+    .then(response => response.json())
+    .then(result => {
+        alert(result.message);
+        listarReservas(); 
+    })
+    .catch(error => {
+        console.error('Erro ao excluir reserva:', error);
+        alert('Erro ao excluir reserva: ' + error.message);
+    });
+}
+
+function mostrarFormEdicao(cpf, pousadaId, nomeCompleto, diaCheckin, diaCheckout, quantidade, valor, metodoPagamento) {
+    fetch(`/buscar_pousada_preco?pousada_id=${pousadaId}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Erro na resposta da rede');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('editar_nomePousada').value = data.nome;
+                document.getElementById('editar_valorDiaria').value = data.valor;
+                calcularValorEdicao(); 
+            } else {
+                alert(data.message);
+                document.getElementById('editar_nomePousada').value = '';
+                document.getElementById('editar_valorDiaria').value = '';
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao buscar pousada:', error);
+            alert('Erro ao buscar pousada: ' + error.message);
+            document.getElementById('editar_nomePousada').value = '';
+            document.getElementById('editar_valorDiaria').value = '';
+        });
+
+    document.getElementById('form_editar_reserva').classList.remove('hidden');
+    document.getElementById('editar_nomeCompleto').value = nomeCompleto;
+    document.getElementById('editar_cpf').value = cpf;
+    document.getElementById('editar_pousadaId').value = pousadaId;
+    document.getElementById('editar_diaCheckin').value = diaCheckin;
+    document.getElementById('editar_diaCheckout').value = diaCheckout;
+    document.getElementById('editar_quantidade').value = quantidade;
+    document.getElementById('editar_valor').value = valor;
+    document.getElementById('editar_metodoPagamento').value = metodoPagamento;
+
+    document.getElementById('editar_diaCheckin').addEventListener('change', calcularValorEdicao);
+    document.getElementById('editar_diaCheckout').addEventListener('change', calcularValorEdicao);
+}
+
+function salvarEdicaoReserva(event) {
+    event.preventDefault();
+    const form = document.getElementById('editarReservaForm');
+
+    const data = {
+        nomeCompleto: form.editar_nomeCompleto.value,
+        cpf: form.editar_cpf.value,
+        pousadaId: form.editar_pousadaId.value,
+        diaCheckin: form.editar_diaCheckin.value,
+        diaCheckout: form.editar_diaCheckout.value,
+        quantidade: form.editar_quantidade.value,
+        valor: form.editar_valor.value,
+        metodoPagamento: form.editar_metodoPagamento.value
+    };
+
+    fetch('/editar_reserva', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Erro na resposta da rede');
+        }
+        return response.json();
+    })
+    .then(result => {
+        if (result.success) {
+            alert(result.message);
+            document.getElementById('form_editar_reserva').classList.add('hidden');
+            listarReservas();
+        } else {
+            alert(result.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro ao editar reserva:', error);
+        alert('Erro ao editar reserva: ' + error.message);
+    });
+}
+
+</script>
+
+

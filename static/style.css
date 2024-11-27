@@ -1,0 +1,297 @@
+/* Estilos globais */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body, html {
+    height: 100%;
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+header {
+    background-color: #0056b3;
+    color: white;
+    text-align: center;
+    padding: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.form-section, .list-section {
+    background: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="date"] {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+button {
+    background-color: #0056b3;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 10px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #004494;
+}
+
+ul {
+    list-style-type: none;
+    background: #e7e7e7;
+    margin: 10px 0; /* Aumenta o espaço entre os itens da lista */
+    padding: 10px;
+    border-radius: 4px;
+}
+
+ul li {
+    background: #e7e7e7;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+.hidden {
+    display: none;
+}
+
+.result-box {
+    margin-top: 20px;
+    padding: 10px;
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+}
+
+.notificacao {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #4caf50;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: opacity 0.3s;
+}
+
+.notificacao.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+/* Estilos para o botão de retornar ao menu */
+.return-menu-button {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.return-menu-button:hover {
+    background-color: #0056b3;
+}
+/* Estilos para o botão de deslogar */
+.logout-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    padding: 10px 15px;
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.logout-button:hover {
+    background-color: #c82333;
+}
+
+/* Estilo dos botões de menu (Pousada, Cliente, Reserva) */
+.menu-button {
+    display: inline-block;
+    padding: 15px 25px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.menu-button:hover {
+    background-color: #218838;
+    transform: scale(1.05);
+}
+
+.menu-option {
+    margin: 20px 0;
+    padding: 20px;
+    background-color: #ffffff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+/* Estilo do chatbot */
+#chatbotButton {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 15px;
+    background-color: #007bff;
+    color: #ffffff;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    z-index: 1001;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+#chatbotButton:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+#chatbotWindow {
+    width: 100%;
+    max-width: 350px;
+    height: 500px;
+    position: fixed;
+    bottom: 100px;
+    right: 20px;
+    border: 2px solid #007bff;
+    border-radius: 15px;
+    display: none;
+    background-color: #ffffff;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+#chatbotHeader {
+    background-color: #007bff;
+    color: #ffffff;
+    padding: 15px;
+    border-top-left-radius: 15px;
+    border-top-right-radius: 15px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.2em;
+    cursor: pointer;
+}
+
+#chatbotContent {
+    padding: 15px;
+    overflow-y: auto;
+    height: calc(100% - 120px);
+    background-color: #f9f9f9;
+}
+
+#chatbotInputContainer {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+    background-color: #f1f1f1;
+    border-bottom-left-radius: 15px;
+    border-bottom-right-radius: 15px;
+}
+
+#chatbotInput {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 1em;
+}
+
+#sendButton {
+    margin-left: 10px;
+    padding: 10px;
+    border: none;
+    background-color: #007bff;
+    color: #ffffff;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: background-color 0.3s;
+}
+
+#sendButton:hover {
+    background-color: #0056b3;
+}
+
+/* Estilo das mensagens */
+.message {
+    margin-bottom: 15px;
+    padding: 10px;
+    border-radius: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.user-message {
+    background-color: #d1e7ff;
+    color: #333;
+    text-align: right;
+    margin-left: auto;
+}
+
+.bot-message {
+    background-color: #f0f0f0;
+    color: #333;
+    text-align: left;
+    margin-right: auto;
+}
+
+/* Responsividade */
+@media (max-width: 600px) {
+    #chatbotWindow {
+        width: 90%;
+        right: 5%;
+        bottom: 80px;
+    }
+
+    #chatbotButton {
+        right: 10px;
+        bottom: 10px;
+    }
+}
